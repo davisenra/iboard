@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -43,8 +44,23 @@ class Post extends Model
         return $this->hasMany(Post::class, 'post_id');
     }
 
+    /**
+     * @param Builder<Post> $query
+     *
+     * @return Builder<Post>
+     */
+    public function scopeWhereIsThread(Builder $query): Builder
+    {
+        return $this->where('post_id', null);
+    }
+
     public function isThread(): bool
     {
         return $this->attributes['post_id'] === null;
+    }
+
+    public function bumpLastRepliedAt(): void
+    {
+        $this->attributes['last_replied_at'] = now();
     }
 }

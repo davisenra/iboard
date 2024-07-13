@@ -39,8 +39,8 @@ class CreateNewThreadTest extends TestCase
             file: $file,
         );
 
-        $sut = new CreateNewThread($payload);
-        $sut->handle();
+        $sut = new CreateNewThread();
+        $sut->handle($payload);
 
         Storage::disk('local')->exists($file->getFilename());
 

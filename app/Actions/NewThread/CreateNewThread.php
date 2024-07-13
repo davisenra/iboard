@@ -8,24 +8,20 @@ use Illuminate\Support\Facades\Storage;
 
 final class CreateNewThread
 {
-    public function __construct(
-        private NewThreadPayload $payload,
-    ) {}
-
-    public function handle(): void
+    public function handle(NewThreadPayload $payload): void
     {
-        $filename = $this->payload->file->getFilename();
+        $filename = $payload->file->getFilename();
 
         Storage::put(
             path: $filename,
-            contents: $this->payload->file,
+            contents: $payload->file,
             options: 'public',
         );
 
         $thread = new Post([
-            'board_id' => $this->payload->boardId,
-            'subject' => $this->payload->subject,
-            'content' => $this->payload->content,
+            'board_id' => $payload->boardId,
+            'subject' => $payload->subject,
+            'content' => $payload->content,
             'file' => Storage::url($filename),
             'last_replied_at' => now(),
         ]);
@@ -33,8 +29,8 @@ final class CreateNewThread
         $thread->save();
 
         Log::info('Thread created', [
-            'board_id' => $this->payload->boardId,
-            'subject' => $this->payload->subject,
+            'board_id' => $payload->boardId,
+            'subject' => $payload->subject,
         ]);
     }
 }
