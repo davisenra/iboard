@@ -2,8 +2,8 @@
 
 namespace App\Actions\ReplyToThread;
 
-use App\Models\Post;
 use App\Exception\PostException;
+use App\Models\Post;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -18,7 +18,7 @@ final class ReplyToThread
             ->where('id', $payload->threadId)
             ->first();
 
-        if (!$thread || !$thread->isThread()) {
+        if (! $thread || ! $thread->isThread()) {
             throw PostException::threadNotFound($payload->threadId);
         }
 
@@ -40,7 +40,9 @@ final class ReplyToThread
             'file' => $hasFile ? Storage::url($filename) : null,
         ]);
 
-        $thread->bumpLastRepliedAt();
+        if (! $payload->isSage()) {
+            $thread->bumpLastRepliedAt();
+        }
 
         DB::transaction(function () use ($reply, $thread) {
             $reply->save();

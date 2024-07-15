@@ -2,13 +2,22 @@
 
 namespace App\Models;
 
+use Database\Factories\PostFactory;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @method static PostFactory factory()
+ * @method static PostFactory|null newFactory()
+ */
 class Post extends Model
 {
+    /** @phpstan-ignore-next-line  */
+    use HasFactory;
+
     public $timestamps = false;
 
     protected static function booted(): void
@@ -19,6 +28,11 @@ class Post extends Model
             return $post;
         });
     }
+
+    protected $casts = [
+        'published_at' => 'immutable_datetime',
+        'last_replied_at' => 'immutable_datetime',
+    ];
 
     /**
      * @return BelongsTo<Board, Post>
@@ -45,8 +59,7 @@ class Post extends Model
     }
 
     /**
-     * @param Builder<Post> $query
-     *
+     * @param  Builder<Post>  $query
      * @return Builder<Post>
      */
     public function scopeWhereIsThread(Builder $query): Builder

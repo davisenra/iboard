@@ -39,3 +39,5 @@ RUN groupadd -g ${HOST_GROUP_ID} ${HOST_GROUP_NAME} && \
 WORKDIR /app
 
 USER ${HOST_USER_NAME}
+
+ENTRYPOINT [ "tail", "-f", "/dev/null" ]

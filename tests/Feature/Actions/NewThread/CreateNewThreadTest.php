@@ -24,11 +24,7 @@ class CreateNewThreadTest extends TestCase
     #[Test]
     public function createNewThread(): void
     {
-        $board = Board::create([
-            'route' => 'b',
-            'name' => 'Random',
-            'description' => '/b/ - Random',
-        ]);
+        $board = Board::factory()->create();
 
         $file = new SplFileObject(__DIR__.'/../../../Fixtures/image.jpeg', 'r');
 

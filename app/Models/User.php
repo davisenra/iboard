@@ -2,12 +2,19 @@
 
 namespace App\Models;
 
+use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+/**
+ * @method static UserFactory factory()
+ * @method static UserFactory|null newFactory()
+ */
 class User extends Authenticatable
 {
-    use Notifiable;
+    /** @phpstan-ignore-next-line  */
+    use HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.

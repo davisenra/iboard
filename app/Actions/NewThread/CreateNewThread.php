@@ -20,7 +20,7 @@ final class CreateNewThread
 
         $thread = new Post([
             'board_id' => $payload->boardId,
-            'subject' => $payload->subject,
+            'subject' => $payload->subject ?: null,
             'content' => $payload->content,
             'file' => Storage::url($filename),
             'last_replied_at' => now(),

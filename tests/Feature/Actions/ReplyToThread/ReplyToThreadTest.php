@@ -26,18 +26,13 @@ class ReplyToThreadTest extends TestCase
     #[Test]
     public function replyToThreadWithImage(): void
     {
-        $board = Board::create([
-            'route' => 'b',
-            'name' => 'Random',
-            'description' => '/b/ - Random',
-        ]);
+        $board = Board::factory()->create();
 
         $thread = Post::create([
             'board_id' => $board->id,
             'subject' => 'Foo',
             'content' => 'Bar',
             'file' => 'foo.jpg',
-            'last_replied_at' => now(),
         ]);
 
         $file = new SplFileObject(__DIR__.'/../../../Fixtures/image.jpeg', 'r');
@@ -63,19 +58,8 @@ class ReplyToThreadTest extends TestCase
     #[Test]
     public function replyToThreadWithoutImage(): void
     {
-        $board = Board::create([
-            'route' => 'b',
-            'name' => 'Random',
-            'description' => '/b/ - Random',
-        ]);
-
-        $thread = Post::create([
-            'board_id' => $board->id,
-            'subject' => 'Foo',
-            'content' => 'Bar',
-            'file' => 'foo.jpg',
-            'last_replied_at' => now(),
-        ]);
+        $board = Board::factory()->create();
+        $thread = Post::factory()->for($board)->create();
 
         $payload = new ReplyPayload(
             threadId: $thread->id,
@@ -94,6 +78,28 @@ class ReplyToThreadTest extends TestCase
     }
 
     #[Test]
+    public function replyWithSageDoesNotBumpTheThread(): void
+    {
+        $board = Board::factory()->create();
+        $thread = Post::factory()->for($board)->create();
+
+        $payload = new ReplyPayload(
+            threadId: $thread->id,
+            content: 'Foo',
+            options: 'sage',
+            file: null
+        );
+
+        $sut = new ReplyToThread();
+        $sut->handle($payload);
+
+        $this->assertDatabaseHas('posts', [
+            'post_id' => $payload->threadId,
+            'last_replied_at' => null,
+        ]);
+    }
+
+    #[Test]
     public function exceptionIsThrownWhenReplyingToNonExistentThread(): void
     {
         $payload = new ReplyPayload(
@@ -103,7 +109,7 @@ class ReplyToThreadTest extends TestCase
         );
 
         $this->expectException(PostException::class);
-        $this->expectExceptionMessage('No thread found for id 420');
+        $this->expectExceptionMessage('No thread found for id: 420');
 
         $sut = new ReplyToThread();
         $sut->handle($payload);
