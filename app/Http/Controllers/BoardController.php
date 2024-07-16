@@ -10,10 +10,6 @@ use Illuminate\View\View;
 
 class BoardController extends Controller
 {
-    public function __construct(
-        private readonly ShowBoard $handler
-    ) {}
-
     public function show(string $boardRoute, Request $request): View
     {
         $page = (int) $request->query('page', '1');
@@ -24,7 +20,8 @@ class BoardController extends Controller
         );
 
         try {
-            $paginatedBoard = $this->handler->handle($payload);
+            $handler = new ShowBoard();
+            $paginatedBoard = $handler->handle($payload);
         } catch (BoardException) {
             abort(404);
         }

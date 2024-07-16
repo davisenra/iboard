@@ -2,7 +2,7 @@
 
 namespace App\DataTransferObjects;
 
-class PaginatedBoardWithThreads
+readonly class PaginatedBoardWithThreads
 {
     public function __construct(
         public string $boardName,

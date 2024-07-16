@@ -4,23 +4,23 @@
             &#47;{{ $boardRoute }}&#47; - {{ $boardName }}
         </h1>
         <hr class="w-full my-3"/>
-        <form class="space-y-0.5" method="post"
+        <form class="space-y-0.5" action="{{ route('thread.store', [$boardRoute]) }}" method="post"
               enctype="multipart/form-data">
             @csrf
             <div class="flex text-sm">
-                <label class="block bg-sky-500 border border-black px-1 w-24 font-bold" for="name">Name</label>
+                <label class="bg-sky-500 border border-black px-1 w-24 font-bold" for="name">Name</label>
                 <input class="ml-0.5 border border-neutral-200 bg-white px-1" type="text" name="name"
                        id="name"
                        value="Anonymous"
                        disabled>
             </div>
             <div class="flex text-sm">
-                <label class="block bg-sky-500 border border-black px-1 w-24 font-bold" for="name">Options</label>
+                <label class="bg-sky-500 border border-black px-1 w-24 font-bold" for="name">Options</label>
                 <input class="ml-0.5 border border-neutral-200 bg-white px-1" type="text" name="options"
                        id="options">
             </div>
             <div class="flex text-sm">
-                <label class="block bg-sky-500 border border-black px-1 w-24 font-bold" for="name">Subject</label>
+                <label class="bg-sky-500 border border-black px-1 w-24 font-bold" for="name">Subject</label>
                 <input class="ml-0.5 border border-neutral-200 bg-white px-1" type="text" name="subject"
                        id="subject">
                 <button class="ml-0.5 px-2 bg-neutral-200 border border-neutral-600 rounded-sm" type="submit">
@@ -28,14 +28,14 @@
                 </button>
             </div>
             <div class="flex text-sm">
-                <label class="block bg-sky-500 border border-black px-1 w-24 font-bold" for="name">Comment</label>
-                <textarea class="ml-0.5 border border-neutral-200 bg-white w-72 h-24 px-1" type="text"
+                <label class="bg-sky-500 border border-black px-1 w-24 font-bold" for="name">Comment</label>
+                <textarea class="ml-0.5 border border-neutral-200 bg-white w-72 h-24"
                           name="content"
                           id="content">
                 </textarea>
             </div>
             <div class="flex text-sm">
-                <label class="block bg-sky-500 border border-black px-1 w-24 font-bold" for="file">File</label>
+                <label class="bg-sky-500 border border-black px-1 w-24 font-bold" for="file">File</label>
                 <input class="ml-0.5 bg-white border border-neutral-200" type="file" name="file"
                        id="file">
             </div>
@@ -57,20 +57,34 @@
                             <p class="text-emerald-600 font-bold">Anonymous</p>
                             <p>{{ $thread->publishedAt->format('d/m/y (D) H:i:s') }}</p>
                             <p>No. <a class="hover:text-red-600" href="#">{{ $thread->threadId }}</a></p>
-                            <p>&#91;<a class="hover:text-red-600" href="#">Reply</a>&#93;</p>
+                            <p>
+                                &#91;
+                                <a class="hover:text-red-600"
+                                   href="{{ route('thread.show', [$boardRoute, $thread->threadId]) }}">Reply</a>
+                                &#93;
+                            </p>
                         </div>
-                        <p>{{ $thread->content }}</p>
+                        <p>{!! $thread->content !!}</p>
                     </div>
                 </div>
                 <div class="mt-3 flex flex-col space-y-3 max-w-6xl">
                     @foreach($thread->recentReplies as $reply)
-                        <div class="p-3 bg-blue-100">
-                            <div class="flex space-x-1">
-                                <p class="text-emerald-600 font-bold">Anonymous</p>
-                                <p>{{ $reply->publishedAt->format('d/m/y (D) H:i:s') }}</p>
-                                <p>No. <a class="hover:text-red-600" href="#">{{ $reply->replyId }}</a></p>
+                        <div id="{{ $reply->replyId }}" class="flex p-3 space-x-2 bg-blue-100">
+                            @if ($reply->file)
+                                <img
+                                    class="max-w-xs"
+                                    src="{{ $reply->file }}"
+                                    alt=""
+                                >
+                            @endif
+                            <div>
+                                <div class="flex space-x-1">
+                                    <p class="text-emerald-600 font-bold">Anonymous</p>
+                                    <p>{{ $reply->publishedAt->format('d/m/y (D) H:i:s') }}</p>
+                                    <p>No. <a class="hover:text-red-600" href="">{{ $reply->replyId }}</a></p>
+                                </div>
+                                <p class="ml-4 mt-2">{!! $reply->content !!}</p>
                             </div>
-                            <p class="ml-4 mt-2">{{ $reply->content }}</p>
                         </div>
                     @endforeach
                 </div>

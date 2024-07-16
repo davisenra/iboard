@@ -2,14 +2,14 @@
 
 namespace App\Actions\NewThread;
 
-use SplFileInfo;
+use Illuminate\Http\UploadedFile;
 
 readonly class NewThreadPayload
 {
     public function __construct(
-        public int $boardId,
+        public string $boardRoute,
         public ?string $subject,
         public string $content,
-        public SplFileInfo $file,
+        public UploadedFile $file,
     ) {}
 }

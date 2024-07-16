@@ -2,35 +2,72 @@
 
 namespace App\Actions\NewThread;
 
+use App\DataTransferObjects\NewlyCreatedThread;
+use App\Exception\BoardException;
+use App\Models\Board;
 use App\Models\Post;
+use App\Services\TextParserPipeline;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 final class CreateNewThread
 {
-    public function handle(NewThreadPayload $payload): void
+    public function handle(NewThreadPayload $payload): NewlyCreatedThread
     {
-        $filename = $payload->file->getFilename();
+        $board = Board::where('route', $payload->boardRoute)->first();
 
-        Storage::put(
-            path: $filename,
-            contents: $payload->file,
-            options: 'public',
-        );
+        if (! $board) {
+            throw BoardException::notFound($payload->boardRoute);
+        }
+
+        $fileUrl = $this->storeFile($payload->file);
+        $content = $this->parseContent($payload->content);
 
         $thread = new Post([
-            'board_id' => $payload->boardId,
+            'board_id' => $board->id,
             'subject' => $payload->subject ?: null,
-            'content' => $payload->content,
-            'file' => Storage::url($filename),
+            'content' => $content,
+            'file' => $fileUrl,
             'last_replied_at' => now(),
         ]);
 
         $thread->save();
 
         Log::info('Thread created', [
-            'board_id' => $payload->boardId,
+            'board_id' => $payload->boardRoute,
             'subject' => $payload->subject,
         ]);
+
+        return new NewlyCreatedThread($thread->id);
+    }
+
+    private function storeFile(UploadedFile $file): string
+    {
+        $filename = sprintf(
+            '%s.%s',
+            mb_substr(sha1((string) time()), 16),
+            $file->getClientOriginalExtension()
+        );
+
+        Storage::putFileAs(
+            path: 'public',
+            file: $file,
+            name: $filename,
+            options: 'public',
+        );
+
+        return Storage::url($filename);
+    }
+
+    private function parseContent(string $content): string
+    {
+        return (new TextParserPipeline($content))
+            ->parseBold()
+            ->parseItalic()
+            ->parseSpoiler()
+            ->parseReplyQuote()
+            ->parseGreenText()
+            ->getContent();
     }
 }

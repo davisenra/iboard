@@ -3,7 +3,7 @@
     @foreach ($boards as $board)
         <a
             class="hover:text-red-600"
-            href="{{ $board->route }}"
+            href="{{ route('board.show', [$board->route]) }}"
             title="{{ $board->title }}"
         >
             {{ $board->route }}

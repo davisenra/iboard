@@ -27,7 +27,7 @@ class ShowBoard
             ->with(['replies' => function ($query) {
                 $query
                     ->select(['id', 'post_id', 'content', 'file', 'options', 'published_at'])
-                    ->orderBy('published_at', 'desc')
+                    ->orderBy('id', 'desc')
                     ->take(3);
             }])
             ->select(['id', 'subject', 'content', 'file', 'published_at', 'last_replied_at'])
@@ -35,16 +35,19 @@ class ShowBoard
             ->paginate(self::PER_PAGE, ['*'], 'page', $payload->page);
 
         $threads = $paginatedThreads->map(function ($thread) {
-            $recentReplies = $thread->replies->map(function ($reply) {
-                return new Reply(
-                    replyId: $reply->id,
-                    threadId: $reply->post_id,
-                    content: $reply->content,
-                    options: $reply->options,
-                    file: $reply->file,
-                    publishedAt: $reply->published_at->toDateTimeImmutable(),
-                );
-            });
+            $recentReplies = $thread
+                ->replies
+                ->reverse()
+                ->map(function ($reply) {
+                    return new Reply(
+                        replyId: $reply->id,
+                        threadId: $reply->post_id,
+                        content: $reply->content,
+                        options: $reply->options,
+                        file: $reply->file,
+                        publishedAt: $reply->published_at->toDateTimeImmutable(),
+                    );
+                });
 
             return new ThreadWithRecentReplies(
                 threadId: $thread->id,

@@ -6,9 +6,9 @@ use App\Actions\NewThread\CreateNewThread;
 use App\Actions\NewThread\NewThreadPayload;
 use App\Models\Board;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\Test;
-use SplFileObject;
 use Tests\TestCase;
 
 class CreateNewThreadTest extends TestCase
@@ -26,10 +26,10 @@ class CreateNewThreadTest extends TestCase
     {
         $board = Board::factory()->create();
 
-        $file = new SplFileObject(__DIR__.'/../../../Fixtures/image.jpeg', 'r');
+        $file = new UploadedFile(__DIR__.'/../../../Fixtures/image.jpeg', 'image.jpeg');
 
         $payload = new NewThreadPayload(
-            boardId: $board->id,
+            boardRoute: $board->route,
             subject: 'Foo',
             content: 'Bar',
             file: $file,
@@ -41,10 +41,9 @@ class CreateNewThreadTest extends TestCase
         Storage::disk('local')->exists($file->getFilename());
 
         $this->assertDatabaseHas('posts', [
-            'board_id' => $payload->boardId,
+            'board_id' => $board->id,
             'subject' => $payload->subject,
             'content' => $payload->content,
-            'file' => Storage::url($file->getFilename()),
         ]);
     }
 }

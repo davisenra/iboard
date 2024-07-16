@@ -18,7 +18,7 @@ class BoardFactory extends Factory
     public function definition(): array
     {
         return [
-            'route' => $this->faker->asciify(),
+            'route' => $this->faker->randomLetter(),
             'name' => $this->faker->words(1, true),
             'description' => $this->faker->words(3, true),
         ];

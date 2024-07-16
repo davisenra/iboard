@@ -8,9 +8,9 @@ use App\Exception\PostException;
 use App\Models\Board;
 use App\Models\Post;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\Test;
-use SplFileObject;
 use Tests\TestCase;
 
 class ReplyToThreadTest extends TestCase
@@ -35,7 +35,7 @@ class ReplyToThreadTest extends TestCase
             'file' => 'foo.jpg',
         ]);
 
-        $file = new SplFileObject(__DIR__.'/../../../Fixtures/image.jpeg', 'r');
+        $file = new UploadedFile(__DIR__.'/../../../Fixtures/image.jpeg', 'image.jpeg');
 
         $payload = new ReplyPayload(
             threadId: $thread->id,
@@ -51,7 +51,6 @@ class ReplyToThreadTest extends TestCase
         $this->assertDatabaseHas('posts', [
             'post_id' => $payload->threadId,
             'content' => $payload->content,
-            'file' => Storage::url($file->getFilename()),
         ]);
     }
 

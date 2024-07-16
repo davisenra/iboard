@@ -2,7 +2,7 @@
 
 namespace App\Actions\ReplyToThread;
 
-use SplFileInfo;
+use Illuminate\Http\UploadedFile;
 
 readonly class ReplyPayload
 {
@@ -10,7 +10,7 @@ readonly class ReplyPayload
         public int $threadId,
         public string $content,
         public ?string $options = null,
-        public ?SplFileInfo $file = null,
+        public ?UploadedFile $file = null,
     ) {}
 
     public function isSage(): bool
