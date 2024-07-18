@@ -10,6 +10,7 @@ readonly class NewThreadPayload
         public string $boardRoute,
         public ?string $subject,
         public string $content,
+        public string $ipAddress,
         public UploadedFile $file,
     ) {}
 }

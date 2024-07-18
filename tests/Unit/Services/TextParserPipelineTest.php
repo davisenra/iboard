@@ -75,7 +75,7 @@ class TextParserPipelineTest extends TestCase
 
         $parsedContent = $parser->parseReplyQuote()->getContent();
 
-        $this->assertEquals('Check this out <a href="#12345">>>12345</a>.', $parsedContent);
+        $this->assertEquals('Check this out <a class="quote" href="#12345">>>12345</a>.', $parsedContent);
     }
 
     #[Test]
@@ -101,7 +101,7 @@ class TextParserPipelineTest extends TestCase
             'This is <em>italic</em> text.<br>'.
             '<span class="greentext">&gt;This is greentext.</span>'.'<br>'.
             'This is a <span class="spoiler">spoiler</span>.<br>'.
-            'Check this out <a href="#12345">>>12345</a>.';
+            'Check this out <a class="quote" href="#12345">>>12345</a>.';
 
         $this->assertEquals($expected, $parsedContent);
     }

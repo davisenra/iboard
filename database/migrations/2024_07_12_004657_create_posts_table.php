@@ -17,10 +17,14 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(Board::class)->constrained();
             $table->foreignIdFor(Post::class)->nullable()->constrained();
-            $table->string('subject')->nullable();
-            $table->string('file')->nullable();
-            $table->string('options')->nullable();
             $table->text('content');
+            $table->string('ip_address');
+            $table->string('subject')->nullable();
+            $table->string('options')->nullable();
+            $table->string('file')->nullable();
+            $table->string('file_size')->nullable();
+            $table->string('original_filename')->nullable();
+            $table->string('file_resolution')->nullable();
             $table->timestamp('published_at');
             $table->timestamp('last_replied_at')->nullable();
         });

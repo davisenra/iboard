@@ -28,6 +28,7 @@ final class ReplyToThread
 
         if ($hasFile) {
             $fileUrl = $this->storeFile($payload->file);
+            $imageSize = $this->getImageSize($payload->file);
         }
 
         $content = $this->parseContent($payload->content);
@@ -37,6 +38,11 @@ final class ReplyToThread
             'post_id' => $thread->id,
             'content' => $content,
             'file' => $fileUrl ?? null,
+            'file_size' => $payload->file?->getSize() ?: null,
+            'file_resolution' => isset($imageSize) ? sprintf('%sx%s', $imageSize[0], $imageSize[1]) : null,
+            'original_filename' => $payload->file?->getClientOriginalName() ?: null,
+            'ip_address' => $payload->ipAddress,
+            'last_replied_at' => null,
         ]);
 
         if (! $payload->isSage()) {
@@ -81,5 +87,13 @@ final class ReplyToThread
             ->parseReplyQuote()
             ->parseGreenText()
             ->getContent();
+    }
+
+    /**
+     * @return array{0: int, 1: int}|null
+     */
+    private function getImageSize(UploadedFile $file): ?array
+    {
+        return getimagesize($file->getPath().'/'.$file->getFilename()) ?: null;
     }
 }

@@ -9,6 +9,7 @@ readonly class ReplyPayload
     public function __construct(
         public int $threadId,
         public string $content,
+        public string $ipAddress,
         public ?string $options = null,
         public ?UploadedFile $file = null,
     ) {}

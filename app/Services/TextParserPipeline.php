@@ -72,7 +72,7 @@ class TextParserPipeline
     {
         $this->content = preg_replace(
             pattern: '/>>(\d+)/',
-            replacement: '<a href="#$1">>>$1</a>',
+            replacement: '<a class="quote" href="#$1">>>$1</a>',
             subject: $this->content
         );
 

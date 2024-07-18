@@ -46,6 +46,7 @@ class ThreadController extends Controller
             boardRoute: $boardRoute,
             subject: $data['subject'],
             content: $data['content'],
+            ipAddress: $request->server->get('REMOTE_ADDR'),
             file: $file,
         );
 

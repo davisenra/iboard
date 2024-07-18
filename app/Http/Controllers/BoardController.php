@@ -12,6 +12,7 @@ class BoardController extends Controller
 {
     public function show(string $boardRoute, Request $request): View
     {
+        dd($request->server->get('REMOTE_ADDR'));
         $page = (int) $request->query('page', '1');
 
         $payload = new ShowBoardPayload(

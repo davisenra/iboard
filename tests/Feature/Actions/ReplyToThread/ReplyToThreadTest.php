@@ -10,9 +10,11 @@ use App\Models\Post;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
+#[CoversClass(ReplyToThread::class)]
 class ReplyToThreadTest extends TestCase
 {
     use DatabaseMigrations;
@@ -27,19 +29,15 @@ class ReplyToThreadTest extends TestCase
     public function replyToThreadWithImage(): void
     {
         $board = Board::factory()->create();
+        $thread = Post::factory()->for($board)->thread()->create();
 
-        $thread = Post::create([
-            'board_id' => $board->id,
-            'subject' => 'Foo',
-            'content' => 'Bar',
-            'file' => 'foo.jpg',
-        ]);
-
+        $userIp = fake()->ipv4();
         $file = new UploadedFile(__DIR__.'/../../../Fixtures/image.jpeg', 'image.jpeg');
 
         $payload = new ReplyPayload(
             threadId: $thread->id,
             content: 'Foo',
+            ipAddress: $userIp,
             file: $file,
         );
 
@@ -48,10 +46,15 @@ class ReplyToThreadTest extends TestCase
 
         Storage::disk('local')->exists($file->getFilename());
 
-        $this->assertDatabaseHas('posts', [
-            'post_id' => $payload->threadId,
-            'content' => $payload->content,
-        ]);
+        $reply = $thread->replies()->first();
+
+        $this->assertNotNull($reply);
+        $this->assertEquals('Foo', $reply->content);
+        $this->assertEquals($userIp, $reply->ip_address);
+        $this->assertNull($reply->options);
+        $this->assertNotNull($reply->file_size);
+        $this->assertEquals('image.jpeg', $reply->original_filename);
+        $this->assertEquals('20x20', $reply->file_resolution);
     }
 
     #[Test]
@@ -63,6 +66,7 @@ class ReplyToThreadTest extends TestCase
         $payload = new ReplyPayload(
             threadId: $thread->id,
             content: 'Foo',
+            ipAddress: fake()->ipv4(),
             file: null,
         );
 
@@ -77,14 +81,40 @@ class ReplyToThreadTest extends TestCase
     }
 
     #[Test]
-    public function replyWithSageDoesNotBumpTheThread(): void
+    public function replyingBumpsTheThread(): void
     {
+        $originalLastPostedAt = now()->subtract('10 days');
+
         $board = Board::factory()->create();
-        $thread = Post::factory()->for($board)->create();
+        $thread = Post::factory()->for($board)->create(['last_replied_at' => $originalLastPostedAt]);
 
         $payload = new ReplyPayload(
             threadId: $thread->id,
             content: 'Foo',
+            ipAddress: fake()->ipv4(),
+            file: null,
+        );
+
+        $sut = new ReplyToThread();
+        $sut->handle($payload);
+
+        $thread->refresh();
+
+        $this->assertTrue($thread->last_replied_at > $originalLastPostedAt);
+    }
+
+    #[Test]
+    public function replyWithSageDoesNotBumpTheThread(): void
+    {
+        $fiveMinutesAgo = now()->subtract('5 minutes');
+
+        $board = Board::factory()->create();
+        $thread = Post::factory()->for($board)->create(['last_replied_at' => $fiveMinutesAgo]);
+
+        $payload = new ReplyPayload(
+            threadId: $thread->id,
+            content: 'Foo',
+            ipAddress: fake()->ipv4(),
             options: 'sage',
             file: null
         );
@@ -92,10 +122,9 @@ class ReplyToThreadTest extends TestCase
         $sut = new ReplyToThread();
         $sut->handle($payload);
 
-        $this->assertDatabaseHas('posts', [
-            'post_id' => $payload->threadId,
-            'last_replied_at' => null,
-        ]);
+        $thread->refresh();
+
+        $this->assertEquals($fiveMinutesAgo->getTimestamp(), $thread->last_replied_at->getTimestamp());
     }
 
     #[Test]
@@ -104,6 +133,7 @@ class ReplyToThreadTest extends TestCase
         $payload = new ReplyPayload(
             threadId: 420,
             content: 'Foo',
+            ipAddress: fake()->ipv4(),
             file: null,
         );
 

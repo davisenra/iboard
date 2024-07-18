@@ -20,7 +20,7 @@ class PostFactory extends Factory
         return [
             'subject' => $this->faker->words(3, true),
             'content' => $this->faker->paragraphs(3, true),
-            'file' => $this->faker->imageUrl(),
+            'ip_address' => $this->faker->ipv4(),
         ];
     }
 
@@ -28,6 +28,10 @@ class PostFactory extends Factory
     {
         return $this->state(function () {
             return [
+                'file' => $this->faker->imageUrl(),
+                'file_size' => $this->faker->randomNumber(5),
+                'original_filename' => $this->faker->word().'.jpg',
+                'file_resolution' => $this->faker->randomNumber(4).'x'.$this->faker->randomNumber(4),
                 'last_replied_at' => $this->faker->dateTimeBetween('-1 day'),
                 'post_id' => null,
             ];
