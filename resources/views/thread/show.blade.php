@@ -51,7 +51,8 @@
                         <p class="text-slate-800 font-bold">{{ $thread->subject  }}</p>
                         <p class="text-emerald-600 font-bold">Anonymous</p>
                         <p>{{ $thread->publishedAt->format('d/m/y (D) H:i:s') }}</p>
-                        <p>No. <a class="hover:text-red-600" href="">{{ $thread->threadId }}</a></p>
+                        <p>No. <a class="hover:text-red-600" href="#{{ $thread->threadId }}">{{ $thread->threadId }}</a>
+                        </p>
                     </div>
                     <p>{!! $thread->content !!}</p>
                 </div>
@@ -70,7 +71,8 @@
                             <div class="flex space-x-1">
                                 <p class="text-emerald-600 font-bold">Anonymous</p>
                                 <p>{{ $reply->publishedAt->format('d/m/y (D) H:i:s') }}</p>
-                                <p>No. <a class="hover:text-red-600" href="">{{ $reply->replyId }}</a></p>
+                                <p>No. <a class="hover:text-red-600"
+                                          href="#{{ $reply->replyId }}">{{ $reply->replyId }}</a></p>
                             </div>
                             <p class="ml-4 mt-2">{!! $reply->content !!}</p>
                         </div>

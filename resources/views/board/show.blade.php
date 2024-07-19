@@ -3,7 +3,7 @@
         <h1 class="font-bold text-2xl text-red-600">
             &#47;{{ $boardRoute }}&#47; - {{ $boardName }}
         </h1>
-        <hr class="w-full my-3"/>
+        <hr class="w-full my-3" />
         <form class="space-y-0.5" action="{{ route('thread.store', [$boardRoute]) }}" method="post"
               enctype="multipart/form-data">
             @csrf
@@ -39,20 +39,27 @@
                        id="file">
             </div>
         </form>
-        <hr class="my-3 w-full"/>
+        <hr class="my-3 w-full" />
     </header>
     <main class="mx-4 flex flex-col space-y-3 lg:mx-6">
         @foreach($threads as $thread)
-            <div class="flex flex-col text-sm max-w-7xl">
-                <p>
-                    File:
-                    <a class="underline hover:text-red-600" href="{{ $thread->file->file }}" target="_blank">
-                        {{ $thread->file->originalFilename }}
-                    </a>
-                    ({{ $thread->file->getHumanReadableFileSize() }}, {{$thread->file->resolution}})
-                </p>
+            <div x-data="{ collapseThread: false }"
+                 class="flex text-sm max-w-7xl" :class="!collapseThread ? 'flex-col' : ''">
+                <div class="flex space-x-2">
+                    <button x-on:click="collapseThread = !collapseThread" class="hover:text-red-600"
+                            x-text="collapseThread ? '[+]' : '[-]'">
+                    </button>
+                    <p>
+                        File:
+                        <a class="underline hover:text-red-600" href="{{ $thread->file->file }}" target="_blank">
+                            {{ $thread->file->originalFilename }}
+                        </a>
+                        ({{ $thread->file->getHumanReadableFileSize() }}, {{$thread->file->resolution}})
+                    </p>
+                </div>
                 <div class="flex space-x-2">
                     <img
+                        x-show="!collapseThread"
                         class="max-w-xs"
                         src="{{ $thread->file->file }}"
                         alt=""
@@ -75,32 +82,50 @@
                                 &#93;
                             </p>
                         </div>
-                        <p>{!! $thread->content !!}</p>
+                        <p x-show="!collapseThread">{!! $thread->content !!}</p>
                     </div>
                 </div>
-                <div class="mt-3 flex flex-col space-y-3 max-w-6xl">
+                <div x-show="!collapseThread" class="mt-3 flex flex-col space-y-3 max-w-6xl">
                     @foreach($thread->recentReplies as $reply)
-                        <div id="{{ $reply->replyId }}" class="flex p-3 space-x-2 bg-blue-100">
+                        <div id="{{ $reply->replyId }}" class="flex flex-col p-3 space-x-2 bg-blue-100">
                             @if ($reply->file)
-                                <img
-                                    class="max-w-xs"
-                                    src="{{ $reply->file->file }}"
-                                    alt=""
-                                >
+                                <p>
+                                    File:
+                                    <a class="underline hover:text-red-600" href="{{ $thread->file->file }}"
+                                       target="_blank">
+                                        {{ $thread->file->originalFilename }}
+                                    </a>
+                                    ({{ $thread->file->getHumanReadableFileSize() }}, {{$thread->file->resolution}})
+                                </p>
                             @endif
-                            <div>
-                                <div class="flex space-x-1">
-                                    <p class="text-emerald-600 font-bold">Anonymous</p>
-                                    <p>{{ $reply->publishedAt->format('d/m/y (D) H:i:s') }}</p>
-                                    <p>No. <a class="hover:text-red-600" href="">{{ $reply->replyId }}</a></p>
+                            <div class="flex space-x-2">
+                                @if ($reply->file)
+                                    <img
+                                        class="max-w-xs"
+                                        src="{{ $reply->file->file }}"
+                                        alt=""
+                                    >
+                                @endif
+                                <div>
+                                    <div class="flex space-x-1">
+                                        <p class="text-emerald-600 font-bold">Anonymous</p>
+                                        <p>{{ $reply->publishedAt->format('d/m/y (D) H:i:s') }}</p>
+                                        <p>
+                                            No.
+                                            <a class="hover:text-red-600"
+                                               href="{{ route('thread.show', [$boardRoute, $thread->threadId, "#$reply->replyId"]) }}">
+                                                {{ $reply->replyId }}
+                                            </a>
+                                        </p>
+                                    </div>
+                                    <p class="ml-4 mt-2">{!! $reply->content !!}</p>
                                 </div>
-                                <p class="ml-4 mt-2">{!! $reply->content !!}</p>
                             </div>
                         </div>
                     @endforeach
                 </div>
             </div>
-            <hr class="my-2"/>
+            <hr class="my-2" />
         @endforeach
         <footer class="pb-3">
             <div class="flex bg-blue-100 border border-blue-200 w-max space-x-1.5 py-1 px-2 text-sm">

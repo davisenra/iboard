@@ -20,10 +20,11 @@
 
 ## Todo:
 
-- [ ] Collapse threads
+- [X] Collapse threads
 - [ ] Expand images on click
 - [ ] Quote replies on click
-- [ ] Jump to thread/reply on click
+- [X] Jump to thread/reply on click
+- [ ] Preview image before submit
 - [ ] Delete threads/replies
 - [ ] Ban users by IP
 - [ ] Rate limit
