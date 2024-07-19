@@ -66,10 +66,11 @@ class ThreadController extends Controller
         $file = $request->file('file');
 
         $payload = new ReplyPayload(
-            (int) $threadId,
-            $data['content'],
-            $data['options'] ?? null,
-            $file,
+            threadId: (int) $threadId,
+            content: $data['content'],
+            ipAddress: $request->server->get('REMOTE_ADDR'),
+            options: $data['options'] ?? null,
+            file: $file,
         );
 
         $handler = new ReplyToThread();
