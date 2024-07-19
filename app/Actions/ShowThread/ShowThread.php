@@ -2,6 +2,7 @@
 
 namespace App\Actions\ShowThread;
 
+use App\DataTransferObjects\File;
 use App\DataTransferObjects\Reply;
 use App\DataTransferObjects\ThreadWithReplies;
 use App\Exception\PostException;
@@ -28,7 +29,7 @@ class ShowThread
                     threadId: $reply->post_id,
                     content: $reply->content,
                     options: $reply->options,
-                    file: $reply->file,
+                    file: $reply->file ? File::fromPost($reply) : null,
                     publishedAt: $reply->published_at->toDateTimeImmutable(),
                 );
             });
@@ -39,7 +40,7 @@ class ShowThread
             threadId: $thread->id,
             subject: $thread->subject,
             content: $thread->content,
-            file: $thread->file,
+            file: File::fromPost($thread),
             publishedAt: $thread->published_at->toDateTimeImmutable(),
             lastRepliedAt: $thread->last_replied_at->toDateTimeImmutable(),
             replies: $replies->toArray()

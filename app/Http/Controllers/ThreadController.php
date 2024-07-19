@@ -44,7 +44,7 @@ class ThreadController extends Controller
 
         $payload = new NewThreadPayload(
             boardRoute: $boardRoute,
-            subject: $data['subject'],
+            subject: $data['subject'] ?? null,
             content: $data['content'],
             ipAddress: $request->server->get('REMOTE_ADDR'),
             file: $file,

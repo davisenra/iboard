@@ -35,6 +35,7 @@ class BoardController extends Controller
             'hasMorePages' => $paginatedBoard->hasMorePages,
             'lastPage' => $paginatedBoard->lastPage,
             'totalItems' => $paginatedBoard->totalItems,
+            'perPage' => $paginatedBoard->itemsPerPage,
         ]);
     }
 }

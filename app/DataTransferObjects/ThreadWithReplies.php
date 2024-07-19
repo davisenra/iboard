@@ -10,9 +10,9 @@ readonly class ThreadWithReplies
         public string $boardRoute,
         public string $boardName,
         public int $threadId,
-        public string $subject,
+        public ?string $subject,
         public string $content,
-        public string $file,
+        public File $file,
         public DateTimeInterface $publishedAt,
         public DateTimeInterface $lastRepliedAt,
         /** @var Reply[] */

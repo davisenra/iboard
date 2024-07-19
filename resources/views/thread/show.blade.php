@@ -4,7 +4,9 @@
             &#47;{{ $boardRoute }}&#47; - {{ $boardName }}
         </h1>
         <hr class="w-full my-3"/>
-        <form class="space-y-0.5" action="{{ route('thread.reply', [$boardRoute, $thread->threadId]) }}" method="post"
+        <form class="space-y-0.5"
+              action="{{ route('thread.reply', [$boardRoute, $thread->threadId]) }}"
+              method="post"
               enctype="multipart/form-data">
             @csrf
             <div class="flex text-sm">
@@ -26,8 +28,7 @@
                 <label class="block bg-sky-500 border border-black px-1 w-24 font-bold" for="name">Comment</label>
                 <textarea class="ml-0.5 border border-neutral-200 bg-white w-72 h-24 px-1" type="text"
                           name="content"
-                          id="content">
-                </textarea>
+                          id="content"></textarea>
             </div>
             <div class="flex text-sm">
                 <label class="block bg-sky-500 border border-black px-1 w-24 font-bold" for="file">File</label>
@@ -42,7 +43,7 @@
             <div class="flex space-x-2">
                 <img
                     class="max-w-xs"
-                    src="{{ $thread->file }}"
+                    src="{{ $thread->file->file }}"
                     alt=""
                 >
                 <div class="flex flex-col">
@@ -61,7 +62,7 @@
                         @if ($reply->file)
                             <img
                                 class="max-w-xs"
-                                src="{{ $reply->file }}"
+                                src="{{ $reply->file->file }}"
                                 alt=""
                             >
                         @endif
@@ -78,5 +79,10 @@
             </div>
         </div>
         <hr class="my-2"/>
+        <footer class="pb-3 text-sm">
+            <a href="{{ route('board.show', [$boardRoute]) }}">
+                &#91;<span class="hover:text-red-600">Return</span>&#93;
+            </a>
+        </footer>
     </main>
 </x-layout>

@@ -18,8 +18,8 @@ class StoreThreadRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'subject' => ['required', 'string'],
             'content' => ['required', 'string'],
+            'subject' => ['nullable', 'string'],
             'file' => ['required', 'file', 'mimetypes:image/jpeg,image/png,image/gif'],
         ];
     }

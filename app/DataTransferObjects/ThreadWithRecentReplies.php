@@ -8,9 +8,9 @@ readonly class ThreadWithRecentReplies
 {
     public function __construct(
         public int $threadId,
-        public string $subject,
+        public ?string $subject,
         public string $content,
-        public string $file,
+        public File $file,
         public DateTimeInterface $publishedAt,
         public DateTimeInterface $lastRepliedAt,
         /** @var Reply[] $recentReplies */

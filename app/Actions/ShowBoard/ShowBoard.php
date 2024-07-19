@@ -2,6 +2,7 @@
 
 namespace App\Actions\ShowBoard;
 
+use App\DataTransferObjects\File;
 use App\DataTransferObjects\PaginatedBoardWithThreads;
 use App\DataTransferObjects\Reply;
 use App\DataTransferObjects\ThreadWithRecentReplies;
@@ -26,11 +27,31 @@ class ShowBoard
         $paginatedThreads = $board->threads()
             ->with(['replies' => function ($query) {
                 $query
-                    ->select(['id', 'post_id', 'content', 'file', 'options', 'published_at'])
+                    ->select([
+                        'id',
+                        'post_id',
+                        'content',
+                        'file',
+                        'file_size',
+                        'original_filename',
+                        'file_resolution',
+                        'options',
+                        'published_at',
+                    ])
                     ->orderBy('id', 'desc')
                     ->take(3);
             }])
-            ->select(['id', 'subject', 'content', 'file', 'published_at', 'last_replied_at'])
+            ->select([
+                'id',
+                'subject',
+                'content',
+                'file',
+                'file_size',
+                'original_filename',
+                'file_resolution',
+                'published_at',
+                'last_replied_at',
+            ])
             ->orderBy('last_replied_at', 'desc')
             ->paginate(self::PER_PAGE, ['*'], 'page', $payload->page);
 
@@ -44,7 +65,7 @@ class ShowBoard
                         threadId: $reply->post_id,
                         content: $reply->content,
                         options: $reply->options,
-                        file: $reply->file,
+                        file: $reply->file ? File::fromPost($reply) : null,
                         publishedAt: $reply->published_at->toDateTimeImmutable(),
                     );
                 });
@@ -53,7 +74,7 @@ class ShowBoard
                 threadId: $thread->id,
                 subject: $thread->subject,
                 content: $thread->content,
-                file: $thread->file,
+                file: File::fromPost($thread),
                 publishedAt: $thread->published_at->toDateTimeImmutable(),
                 lastRepliedAt: $thread->last_replied_at->toDateTimeImmutable(),
                 recentReplies: $recentReplies->toArray()
@@ -67,7 +88,8 @@ class ShowBoard
             currentPage: $paginatedThreads->currentPage(),
             hasMorePages: $paginatedThreads->currentPage() !== $paginatedThreads->lastPage(),
             lastPage: $paginatedThreads->lastPage(),
-            totalItems: $paginatedThreads->total()
+            totalItems: $paginatedThreads->total(),
+            itemsPerPage: self::PER_PAGE
         );
     }
 }

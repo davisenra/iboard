@@ -12,6 +12,7 @@ readonly class PaginatedBoardWithThreads
         public int $currentPage,
         public bool $hasMorePages,
         public int $lastPage,
-        public int $totalItems
+        public int $totalItems,
+        public int $itemsPerPage,
     ) {}
 }

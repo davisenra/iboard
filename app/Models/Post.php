@@ -32,6 +32,7 @@ class Post extends Model
     protected $casts = [
         'published_at' => 'immutable_datetime',
         'last_replied_at' => 'immutable_datetime',
+        'file_size' => 'int',
     ];
 
     /**

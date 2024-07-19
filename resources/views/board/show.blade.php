@@ -31,8 +31,7 @@
                 <label class="bg-sky-500 border border-black px-1 w-24 font-bold" for="name">Comment</label>
                 <textarea class="ml-0.5 border border-neutral-200 bg-white w-72 h-24"
                           name="content"
-                          id="content">
-                </textarea>
+                          id="content"></textarea>
             </div>
             <div class="flex text-sm">
                 <label class="bg-sky-500 border border-black px-1 w-24 font-bold" for="file">File</label>
@@ -45,10 +44,17 @@
     <main class="mx-4 flex flex-col space-y-3 lg:mx-6">
         @foreach($threads as $thread)
             <div class="flex flex-col text-sm max-w-7xl">
+                <p>
+                    File:
+                    <a class="underline hover:text-red-600" href="{{ $thread->file->file }}" target="_blank">
+                        {{ $thread->file->originalFilename }}
+                    </a>
+                    ({{ $thread->file->getHumanReadableFileSize() }}, {{$thread->file->resolution}})
+                </p>
                 <div class="flex space-x-2">
                     <img
                         class="max-w-xs"
-                        src="{{ $thread->file }}"
+                        src="{{ $thread->file->file }}"
                         alt=""
                     >
                     <div class="flex flex-col">
@@ -56,7 +62,12 @@
                             <p class="text-slate-800 font-bold">{{ $thread->subject  }}</p>
                             <p class="text-emerald-600 font-bold">Anonymous</p>
                             <p>{{ $thread->publishedAt->format('d/m/y (D) H:i:s') }}</p>
-                            <p>No. <a class="hover:text-red-600" href="#">{{ $thread->threadId }}</a></p>
+                            <p>No.
+                                <a class="hover:text-red-600"
+                                   href="{{ route('thread.show', [$boardRoute, $thread->threadId]) }}">
+                                    {{ $thread->threadId }}
+                                </a>
+                            </p>
                             <p>
                                 &#91;
                                 <a class="hover:text-red-600"
@@ -73,7 +84,7 @@
                             @if ($reply->file)
                                 <img
                                     class="max-w-xs"
-                                    src="{{ $reply->file }}"
+                                    src="{{ $reply->file->file }}"
                                     alt=""
                                 >
                             @endif
@@ -91,5 +102,17 @@
             </div>
             <hr class="my-2"/>
         @endforeach
+        <footer class="pb-3">
+            <div class="flex bg-blue-100 border border-blue-200 w-max space-x-1.5 py-1 px-2 text-sm">
+                @for ($i = 1; $i <= $lastPage; $i++)
+                    <p>
+                        &#91;
+                        <a href="{{ request()->fullUrlWithQuery(['page' => $i]) }}"
+                           class="{{ $currentPage == $i ? 'font-bold' : '' }} hover:text-red-600">{{ $i }}</a>
+                        &#93;
+                    </p>
+                @endfor
+            </div>
+        </footer>
     </main>
 </x-layout>

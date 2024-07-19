@@ -17,3 +17,16 @@
 - `docker compose -f compose.dev.yml exec workspace php artisan migrate`
 - `docker compose -f compose.dev.yml exec workspace php artisan test`
 - `docker compose -f compose.dev.yml up -d`
+
+## Todo:
+
+- [ ] Collapse threads
+- [ ] Expand images on click
+- [ ] Quote replies on click
+- [ ] Jump to thread/reply on click
+- [ ] Delete threads/replies
+- [ ] Ban users by IP
+- [ ] Rate limit
+- [ ] Admin panel
+- [ ] Moderators/janitors
+- [ ] Caching
